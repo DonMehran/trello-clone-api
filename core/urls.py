@@ -16,8 +16,19 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+
+auth_api_urls = []
+
+if settings.DEBUG:
+     auth_api_urls.append(path('verify/', include('rest_framework.urls')))
+
+api_url_patterns = [
+    path('auth/', include(auth_api_urls)),
+    path('', include('user.urls')),
+]
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('user.urls'))
+    path('api/', include(api_url_patterns)),
 ]

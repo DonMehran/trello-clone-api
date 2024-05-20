@@ -25,8 +25,11 @@ SECRET_KEY = 'django-insecure-db^9_!kq=gs#cvbihyselcg71!66bv3k^)o1!%cg+1zk12!erx
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://8001-idx-house-1716238308716.cluster-6yqpn75caneccvva7hjo4uejgk.cloudworkstations.dev'
+]
 
 # Application definition
 
@@ -101,6 +104,15 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ],
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
