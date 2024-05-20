@@ -3,3 +3,4 @@ __pycache__
 .idx
 .vscode
 devserver.sh
+db.sqlite3
