@@ -3,18 +3,53 @@ from rest_framework import serializers
 from django.contrib.auth.hashers import make_password
 
 class UserSerializers(serializers.ModelSerializer):
+    old_password = serializers.CharField(write_only=True, required=False)
     class Meta:
         model = User
         fields = ['url', 'id', 'username', 'email', 'first_name', 
-                  'last_name', 'password',]
+                  'last_name', 'password', 'old_password']
 
         extra_kwargs = {
-            'password': {'write_only': True},
-            'username': {'read_only': True}
+            'password': {'write_only': True}, 'username': {'read_only': True}
         }
+
+    def __init__(self, *args, **kwargs):
+        super(UserSerializers, self).__init__(*args, **kwargs)
+        self.fields['password'].style = {'input_type': 'password'}
+        self.fields['old_password'].style = {'input_type': 'password'}
+        if self.instance:
+            self.fields['password'].required = False
     
+    def update(self, instance, validated_data):
+        password, old_password, changed = None, None,  None
+        if 'password' in validated_data:
+            password = validated_data.pop('password')
+
+        if 'old_password' in validated_data:
+            old_password = validated_data.pop('old_password')
+        
+        if password:
+            if instance.check_password(old_password):
+                instance.password = password
+            else:
+                raise serializers.ValidationError('old password is incorrect')
+        
+        elif old_password and not password:
+            raise serializers.ValidationError('new password is not provided')
+
+        for attr, value in validated_data.items():
+            if value != '':
+                changed = True
+                setattr(instance, attr, value)
+        # return super(UserSerializers, self).update(instance, validated_data)
+
+        if changed:
+            instance.save()
+        return instance
+
     def validate(self, data):
-        data['password'] = make_password(data['password'])
+        if 'password' in data:
+            data['password'] = make_password(data['password'])
         return data
         
     

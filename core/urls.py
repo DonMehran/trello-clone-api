@@ -18,7 +18,9 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 
-auth_api_urls = []
+auth_api_urls = [
+    path('', include('rest_framework_social_oauth2.urls', namespace='api-auth'))
+]
 
 if settings.DEBUG:
      auth_api_urls.append(path('verify/', include('rest_framework.urls')))
@@ -29,6 +31,6 @@ api_url_patterns = [
 ]
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admin/', admin.site.urls, name='admin'),
     path('api/', include(api_url_patterns)),
 ]
