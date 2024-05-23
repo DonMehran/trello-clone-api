@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
+from django.conf.urls.static import static
 
 auth_api_urls = [
     path('', include('rest_framework_social_oauth2.urls', namespace='api-auth'))
@@ -33,4 +34,4 @@ api_url_patterns = [
 urlpatterns = [
     path('admin/', admin.site.urls, name='admin'),
     path('api/', include(api_url_patterns)),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

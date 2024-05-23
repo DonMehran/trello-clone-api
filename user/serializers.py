@@ -1,13 +1,21 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from django.contrib.auth.hashers import make_password
+from .models import ProfileModel
+
 
 class UserSerializers(serializers.ModelSerializer):
     old_password = serializers.CharField(write_only=True, required=False)
+    profile = serializers.SerializerMethodField(method_name='get_profile_serializer_str')
+
+    def get_profile_serializer_str(self, obj):
+        profile_serializer = ShowProfileInsideUser(obj.profilemodel, context={'request': self.context['request']})
+        return profile_serializer.data
+
     class Meta:
         model = User
         fields = ['url', 'id', 'username', 'email', 'first_name', 
-                  'last_name', 'password', 'old_password']
+                  'last_name', 'password', 'old_password', 'profile']
 
         extra_kwargs = {
             'password': {'write_only': True}, 'username': {'read_only': True}
@@ -52,4 +60,28 @@ class UserSerializers(serializers.ModelSerializer):
             data['password'] = make_password(data['password'])
         return data
         
-    
+
+class ProfileSerializer(serializers.ModelSerializer):
+    user = UserSerializers(read_only=True)
+    class Meta:
+        model = ProfileModel
+        fields = ['url', 'id', 'image', 'user']
+
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        rep['user']['user_url'] = rep['user'].pop('url')
+        rep['user']['user_id'] = rep['user'].pop('id')
+        rep['user'].pop('profile')
+        return rep
+
+class ShowProfileInsideUser(serializers.ModelSerializer):
+    # user_url = serializers.HyperlinkedIdentityField(read_only=True, many=False, view_name='user-detail')
+    profile_url = serializers.HyperlinkedIdentityField(read_only=True, many=False, view_name='profilemodel-detail')
+
+    profile_id = serializers.IntegerField(source='id')
+    class Meta:
+        model = ProfileModel
+        fields = ['profile_url', 'profile_id', 'image']
+
+
+# UserSerializers._declared_fields['profile_serializer_str'] = ProfileSerializer(read_only=True)
