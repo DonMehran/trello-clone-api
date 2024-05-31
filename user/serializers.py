@@ -63,9 +63,12 @@ class UserSerializers(serializers.ModelSerializer):
 
 class ProfileSerializer(serializers.ModelSerializer):
     user = UserSerializers(read_only=True)
+    # this is the way to access of field of a related model
+    house_name = serializers.CharField(source='house.name', read_only=True)
+    house_url = serializers.HyperlinkedIdentityField(read_only=True, many=False, view_name='housemodel-detail')
     class Meta:
         model = ProfileModel
-        fields = ['url', 'id', 'image', 'user']
+        fields = ['url', 'id', 'image', 'user', 'house_name', 'house_url']
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
