@@ -1,0 +1,7 @@
+{
+"client_id": "MWMA6rauUlvuR6E9oaaTHxpVmPDXTHwNAIS1WBTV",
+"cliend_secret": "pbkdf2_sha256$720000$SaUwJByaRMpA7uRgNGVPNj$mUg0U5R2RKZpNYxz5vI+aPeQHG/sDGV1hyAZZycWoyA=",
+"grant_type": "password",
+"username": "admin",
+"password": "1234"
+}
