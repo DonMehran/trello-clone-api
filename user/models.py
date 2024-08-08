@@ -17,10 +17,12 @@ class GenerateProfileImagePath(object):
         name = f'profile_image.{ext}'
         return path + name
 
+
 user_profile_image_path = GenerateProfileImagePath()
 
+
 class ProfileModel(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     image = models.FileField(upload_to=user_profile_image_path, blank=True, null=True)
     # each profile can only be in one house but each house can have many profile
     # so its a one to many -> one: house, many: profiles

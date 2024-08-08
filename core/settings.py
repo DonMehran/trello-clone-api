@@ -48,7 +48,8 @@ INSTALLED_APPS = [
     'rest_framework_social_oauth2',
 
     'user.apps.UserConfig',
-    'house.apps.HouseConfig'
+    'house.apps.HouseConfig',
+    'task.apps.TaskConfig'
 
 ]
 
