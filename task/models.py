@@ -71,6 +71,7 @@ class AttachmentModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     data = models.FileField(upload_to=task_image_path)
     task = models.ForeignKey(TaskModel, related_name='attachments', on_delete=models.CASCADE)
+    created_by = models.ForeignKey("user.ProfileModel", on_delete=models.CASCADE)
 
     def __str__(self):
         return f'{self.id} | {self.task}'

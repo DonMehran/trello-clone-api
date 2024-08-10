@@ -20,6 +20,8 @@ class AttachmentAdmin(admin.ModelAdmin):
 
     # to make sure this field is not editable:
     def has_change_permission(self, request, obj=None):
+        if obj and request.user.profile == obj.created_by:
+            return True
         return False
 
 

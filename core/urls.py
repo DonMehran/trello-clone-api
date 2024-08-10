@@ -19,6 +19,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from house import urls as house_urls
+from task import urls as task_urls
 
 auth_api_urls = [
     path('', include('rest_framework_social_oauth2.urls', namespace='api-auth'))
@@ -31,6 +32,7 @@ api_url_patterns = [
     path('auth/', include(auth_api_urls)),
     path('', include('user.urls')),
     path('house/', include(house_urls.router.urls)),
+    path('task/', include(task_urls.router.urls)),
 ]
 
 urlpatterns = [

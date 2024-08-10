@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework import viewsets
 from .models import HouseModel
 from user.models import ProfileModel
-from .serializers import HouserSerializer
+from .serializers import HouseSerializer
 from .permissions import IsHouseManagerOrNone
 # Create your views here.
 from rest_framework.decorators import action
@@ -10,10 +10,11 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 
+
 class HouseViewSet(viewsets.ModelViewSet):
     permission_classes = [IsHouseManagerOrNone]
     queryset = HouseModel.objects.all()
-    serializer_class = HouserSerializer
+    serializer_class = HouseSerializer
 
     @action(detail=True, methods=['post'], name='Join', permission_classes=[])
     def join(self, request, pk=None):
@@ -26,12 +27,13 @@ class HouseViewSet(viewsets.ModelViewSet):
                 user_profile.save()
                 return Response({'message': 'You have successfully joined the house.'}, status=status.HTTP_200_OK)
             elif user_profile in house.members.all():
-                return Response({'message': 'You are already a member of this house.'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'message': 'You are already a member of this house.'},
+                                status=status.HTTP_400_BAD_REQUEST)
             else:
                 return Response({'message': 'You are already in a house.'}, status=status.HTTP_400_BAD_REQUEST)
 
         except Exception as e:
-            return Response(status = status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @action(detail=True, methods=['post'], name='leave', permission_classes=[])
     def leave(self, request, pk=None):
@@ -46,7 +48,7 @@ class HouseViewSet(viewsets.ModelViewSet):
             else:
                 return Response({'message': 'You are not in this house.'}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
-            return Response(status = status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     @action(detail=True, methods=['post'], name='remove_member', permission_classes=[IsHouseManagerOrNone])
     def remove_member(self, request, pk=None):
@@ -66,9 +68,9 @@ class HouseViewSet(viewsets.ModelViewSet):
                 return Response({'message': 'Member removed successfully.'}, status=status.HTTP_200_OK)
             else:
                 return Response({'message': 'Member not part of this house.'}, status=status.HTTP_404_NOT_FOUND)
-        
+
         except ProfileModel.DoesNotExist:
             return Response({'message': 'Profile not found.'}, status=status.HTTP_404_NOT_FOUND)
 
         except Exception as e:
-            return Response(status = status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
