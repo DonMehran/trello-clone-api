@@ -19,6 +19,17 @@ class TaskListSerializer(serializers.ModelSerializer):
 
         read_only_fields = ['id', 'created_at', 'status']
 
+    def validate_house(self, value):
+        request = self.context.get('request')
+        if request.user.profile.house != value:
+            raise serializers.ValidationError('you cant make a task list for another house')
+        return value
+
+    def create(self, validated_data):
+        user = self.context.get('request').user.profile
+        validated_data['created_by'] = user
+        return super(TaskListSerializer, self).create(validated_data)
+
 
 class TaskSerializer(serializers.ModelSerializer):
     completed_by = serializers.HyperlinkedRelatedField(read_only=True, many=False,
@@ -37,6 +48,17 @@ class TaskSerializer(serializers.ModelSerializer):
                   'created_by', 'completed_by', 'task_list', 'attachments']
         read_only_fields = ['id', 'created_at', 'created_by', 'completed_on', 'completed_by']
 
+    def validate_task_list(self, value):
+        request = self.context.get('request')
+        if request.user.profile.house != value.house:
+            raise serializers.ValidationError('Task list does not belong to this house')
+        return value
+
+    def create(self, validated_data):
+        user = self.context.get('request').user.profile
+        validated_data['created_by'] = user
+        return super(TaskSerializer, self).create(validated_data)
+
 
 class AttachmentSerializer(serializers.ModelSerializer):
     task = serializers.HyperlinkedRelatedField(queryset=TaskModel.objects.all(), many=False,
@@ -54,3 +76,11 @@ class AttachmentSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         validated_data['created_by'] = request.user.profile
         return super(AttachmentSerializer, self).create(validated_data)
+
+    def validate_task(self, value):
+        user = self.context.get('request').user.profile
+        print(user.house, value.task_list.house)
+        if user.house != value.task_list.house:
+            raise serializers.ValidationError('Task does not belong to the house you are part of')
+        return value
+
